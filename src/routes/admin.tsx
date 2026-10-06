@@ -1,8 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useEffect, useMemo } from "react";
 import {
-  DEFAULT_ADMIN_USERNAME,
-  DEFAULT_ADMIN_PASSWORD,
   SPECIAL_ACCESS_SECRET,
   getAdminCredentials,
   updateAdminCredentials,
@@ -109,28 +107,6 @@ function AdminPage() {
         window.history.replaceState({}, "", "/admin");
         return;
       }
-
-      if (params.get("autofill") === "true") {
-        const creds = getAdminCredentials();
-        setUsernameInput(creds.username);
-        setPasswordInput(creds.password);
-        toast.info("Credentials pre-filled from special link. Click Sign In.");
-      }
-
-      if (params.get("clear") === "true") {
-        clearAllAdminData();
-        setOrders([]);
-        setAnalytics({
-          totalViews: 0,
-          uniqueVisitorIds: [],
-          todayViewsCount: 0,
-          todayDate: new Date().toISOString().split("T")[0] || "",
-          pathCounts: {},
-          recentLogs: [],
-        });
-        toast.success("All admin panel data cleared successfully!");
-        window.history.replaceState({}, "", "/admin");
-      }
     }
 
     const auth = isAdminAuthenticated();
@@ -231,14 +207,6 @@ function AdminPage() {
     adminLogout();
     setIsAuthenticated(false);
     toast.info("Logged out successfully");
-  };
-
-  const handleQuickFillDemo = () => {
-    const current = getAdminCredentials();
-    setUsernameInput(current.username);
-    setPasswordInput(current.password);
-    setLoginError("");
-    toast.info("Credentials prefilled!");
   };
 
   const handleStatusChange = (orderId: string, nextStatus: OrderStatus) => {
@@ -435,7 +403,7 @@ function AdminPage() {
                   type="text"
                   value={usernameInput}
                   onChange={(e) => setUsernameInput(e.target.value)}
-                  placeholder="admin_umbrella"
+                  placeholder="Enter username"
                   required
                   autoComplete="username"
                   className="w-full rounded-xl border border-input bg-background pl-10 pr-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition"
@@ -477,50 +445,6 @@ function AdminPage() {
               <span>Sign In to Admin Dashboard</span>
             </button>
           </form>
-
-          {/* Quick Credential Hint Box */}
-          <div className="mt-6 pt-5 border-t border-border/80 text-center">
-            <div className="rounded-xl bg-secondary/60 p-3.5 text-left border border-border/60">
-              <div className="flex items-center justify-between text-xs font-semibold text-accent mb-1.5">
-                <span className="flex items-center gap-1.5">
-                  <ShieldCheck className="w-3.5 h-3.5" /> Default Strong Credentials:
-                </span>
-                <button
-                  type="button"
-                  onClick={handleQuickFillDemo}
-                  className="text-[11px] underline text-primary hover:text-accent font-semibold cursor-pointer"
-                >
-                  Auto-Fill
-                </button>
-              </div>
-              <p className="text-[11px] text-muted-foreground font-mono">
-                User: <strong className="text-foreground">{DEFAULT_ADMIN_USERNAME}</strong>
-              </p>
-              <p className="text-[11px] text-muted-foreground font-mono">
-                Pass: <strong className="text-foreground">{DEFAULT_ADMIN_PASSWORD}</strong>
-              </p>
-            </div>
-            
-            <div className="mt-3">
-              <button
-                type="button"
-                onClick={() => {
-                  loginWithSpecialKey(SPECIAL_ACCESS_SECRET);
-                  setIsAuthenticated(true);
-                  refreshData();
-                  toast.success("✨ Instant Login with Special Key successful!");
-                }}
-                className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-primary/30 bg-primary/10 hover:bg-primary/20 px-3.5 py-2 text-xs font-semibold text-primary transition cursor-pointer"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-sun" />
-                <span>1-Click Instant Login</span>
-              </button>
-            </div>
-
-            <p className="text-[11px] text-muted-foreground mt-3">
-              You can change credentials and view your special bookmark link inside Settings.
-            </p>
-          </div>
         </div>
       </div>
     );
@@ -1362,7 +1286,7 @@ function AdminPage() {
             <div className="rounded-2xl border border-border/60 bg-secondary/40 p-5 text-xs text-muted-foreground space-y-2">
               <span className="font-semibold text-foreground">💡 How to Access:</span>
               <p>
-                Bookmark <code className="px-1.5 py-0.5 rounded bg-card border border-border text-foreground font-mono">/admin</code> in your browser, or click the discrete <strong>Staff Portal</strong> link at the bottom of the website footer.
+                Bookmark <code className="px-1.5 py-0.5 rounded bg-card border border-border text-foreground font-mono">/admin</code> in your browser for direct private access to this portal.
               </p>
             </div>
           </section>
