@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { SITE } from "@/lib/site";
 import { useCart } from "@/lib/cart-context";
-import { ShoppingBag, Home, Facebook, Instagram, Lock } from "lucide-react";
+import { ShoppingBag, Home, Facebook, Instagram } from "lucide-react";
 
 export function Umbrella({ className = "" }: { className?: string }) {
   return (
@@ -123,13 +123,6 @@ export function Footer() {
       </div>
       <div className="border-t border-primary-foreground/10 py-6 px-6 text-xs text-primary-foreground/60 flex flex-col sm:flex-row items-center justify-between max-w-6xl mx-auto gap-3">
         <p>© Little Umbrella Cafe, Vancouver</p>
-        <Link
-          to="/admin"
-          className="inline-flex items-center gap-1.5 opacity-60 hover:opacity-100 hover:text-sun transition-all duration-200"
-        >
-          <Lock className="w-3.5 h-3.5" />
-          <span>Staff / Admin Portal</span>
-        </Link>
       </div>
     </footer>
   );
