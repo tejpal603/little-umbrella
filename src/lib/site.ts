@@ -3,8 +3,6 @@ export const SITE = {
   address: "4372 W 10th Ave, Vancouver, BC V6R 2H7",
   phone: "+1 778-452-5831",
   phoneHref: "tel:+17784525831",
-  whatsapp: "+1 778-452-5831",
-  whatsappHref: "https://wa.me/17784525831",
   email: "hello@yourlittleumbrella.com",
   emailHref: "mailto:hello@yourlittleumbrella.com",
   facebookUrl: "https://www.facebook.com",
