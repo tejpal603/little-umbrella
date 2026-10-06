@@ -3,7 +3,6 @@ import { Fragment, useState } from "react";
 import { ChevronDown, MapPin, Phone, Clock, Mail, Instagram } from "lucide-react";
 import cafeInterior from "@/assets/cafe-interior.jpg";
 import { SITE, HOURS, getCafeStatus } from "@/lib/site";
-import { WhatsAppIcon } from "@/components/SiteChrome";
 
 export const Route = createFileRoute("/visit")({
   head: () => ({
@@ -38,21 +37,11 @@ function VisitPage() {
             <div className="group">
               <dt className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Phone className="h-4 w-4 text-accent transition-transform group-hover:anim-phone" />
-                Phone & WhatsApp
+                Phone
               </dt>
               <dd className="mt-1 text-lg flex flex-wrap items-center gap-3">
                 <a href={SITE.phoneHref} className="underline underline-offset-4 hover:text-accent transition-colors">
                   {SITE.phone}
-                </a>
-                <a
-                  href={SITE.whatsappHref}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full bg-[#25D366] text-white shadow-xs hover:opacity-90 transition-all hover:scale-105"
-                  title="Chat on WhatsApp"
-                >
-                  <WhatsAppIcon className="w-3.5 h-3.5 fill-current" />
-                  <span>WhatsApp</span>
                 </a>
               </dd>
             </div>
