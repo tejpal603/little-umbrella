@@ -1,0 +1,235 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-display: "Fraunces", Georgia, serif;
+  --font-sans: "Karla", system-ui, sans-serif;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-sun: var(--sun);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+}
+
+:root {
+  --radius: 0.75rem;
+  --background: oklch(0.975 0.012 80);
+  --foreground: oklch(0.24 0.03 50);
+  --card: oklch(0.99 0.008 80);
+  --card-foreground: oklch(0.24 0.03 50);
+  --popover: oklch(0.99 0.008 80);
+  --popover-foreground: oklch(0.24 0.03 50);
+  --primary: oklch(0.26 0.035 50);
+  --primary-foreground: oklch(0.97 0.015 80);
+  --secondary: oklch(0.93 0.025 80);
+  --secondary-foreground: oklch(0.26 0.035 50);
+  --muted: oklch(0.94 0.018 80);
+  --muted-foreground: oklch(0.48 0.03 55);
+  --accent: oklch(0.58 0.13 42);
+  --accent-foreground: oklch(0.98 0.01 80);
+  --sun: oklch(0.82 0.15 82);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.88 0.02 75);
+  --input: oklch(0.88 0.02 75);
+  --ring: oklch(0.58 0.13 42);
+}
+
+@layer base {
+  * { border-color: var(--color-border); }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+  }
+  h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.02em; }
+}
+
+/* ==========================================================================
+   Animated Icons — Keyframes & Interactive Micro-Animations
+   ========================================================================== */
+
+@keyframes icon-sway {
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  25% { transform: rotate(-9deg) translateY(-2px); }
+  75% { transform: rotate(9deg) translateY(-2px); }
+}
+
+@keyframes icon-steam {
+  0%, 100% { transform: translateY(0) scale(1); opacity: 0.85; }
+  50% { transform: translateY(-4px) scale(1.1); opacity: 1; }
+}
+
+@keyframes icon-sun-glow {
+  0% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.1); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+@keyframes icon-wifi-wave {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.18); opacity: 1; filter: drop-shadow(0 0 4px currentColor); }
+}
+
+@keyframes icon-plug-spark {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  20% { transform: scale(0.92) rotate(-10deg); }
+  40% { transform: scale(1.18) rotate(10deg); }
+  60% { transform: scale(0.95) rotate(-6deg); }
+  80% { transform: scale(1.08) rotate(4deg); }
+}
+
+@keyframes icon-star-twinkle {
+  0%, 100% { transform: scale(1) rotate(0deg); filter: brightness(1); }
+  50% { transform: scale(1.3) rotate(18deg); filter: brightness(1.35) drop-shadow(0 0 4px currentColor); }
+}
+
+@keyframes icon-flame-flicker {
+  0%, 100% { transform: scale(1) translateY(0); filter: brightness(1); }
+  25% { transform: scale(1.14, 0.92) translateY(-2px); filter: brightness(1.25); }
+  75% { transform: scale(0.95, 1.08) translateY(-1px); filter: brightness(1.12); }
+}
+
+@keyframes icon-snowflake-drift {
+  0% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(90deg) scale(1.12); }
+  100% { transform: rotate(180deg) scale(1); }
+}
+
+@keyframes icon-sparkle-twinkle {
+  0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.8; }
+  50% { transform: scale(1.3) rotate(45deg); opacity: 1; filter: drop-shadow(0 0 5px currentColor); }
+}
+
+@keyframes icon-cart-bounce {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-4px) rotate(-8deg); }
+  50% { transform: translateY(0) rotate(0deg); }
+  75% { transform: translateY(-2px) rotate(6deg); }
+}
+
+@keyframes icon-heart-beat {
+  0%, 100% { transform: scale(1); }
+  14% { transform: scale(1.25); }
+  28% { transform: scale(1); }
+  42% { transform: scale(1.2); }
+  70% { transform: scale(1); }
+}
+
+@keyframes icon-pin-bounce {
+  0%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-6px) scale(1.08); }
+  60% { transform: translateY(1px) scale(0.95); }
+  80% { transform: translateY(-2px); }
+}
+
+@keyframes icon-clock-tick {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(14deg); }
+  75% { transform: rotate(-14deg); }
+}
+
+@keyframes icon-phone-ring {
+  0%, 100% { transform: rotate(0deg); }
+  10%, 30%, 50% { transform: rotate(-14deg); }
+  20%, 40%, 60% { transform: rotate(14deg); }
+  70% { transform: rotate(0deg); }
+}
+
+@keyframes icon-pop {
+  0% { transform: scale(0.8); }
+  50% { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
+
+@keyframes icon-float-gentle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+/* Continuous Ambient Animation Classes */
+.anim-sway { animation: icon-sway 2.6s ease-in-out infinite; transform-origin: top center; }
+.anim-steam { animation: icon-steam 2.2s ease-in-out infinite; }
+.anim-sun { animation: icon-sun-glow 14s linear infinite; }
+.anim-wifi { animation: icon-wifi-wave 2s ease-in-out infinite; }
+.anim-plug { animation: icon-plug-spark 2.4s ease-in-out infinite; }
+.anim-star { animation: icon-star-twinkle 2s ease-in-out infinite; }
+.anim-flame { animation: icon-flame-flicker 1.5s ease-in-out infinite; transform-origin: bottom center; }
+.anim-snowflake { animation: icon-snowflake-drift 8s linear infinite; }
+.anim-sparkle { animation: icon-sparkle-twinkle 2.2s ease-in-out infinite; }
+.anim-cart { animation: icon-cart-bounce 2s ease-in-out infinite; }
+.anim-heart { animation: icon-heart-beat 1.6s ease-in-out infinite; }
+.anim-pin { animation: icon-pin-bounce 2s ease-in-out infinite; }
+.anim-clock { animation: icon-clock-tick 3s ease-in-out infinite; transform-origin: center center; }
+.anim-phone { animation: icon-phone-ring 2.8s ease-in-out infinite; }
+.anim-float { animation: icon-float-gentle 3.2s ease-in-out infinite; }
+
+/* Interactive Hover Triggered Classes (play on hover or parent .group:hover) */
+.group:hover .group-anim-sway,
+.hover-anim-sway:hover { animation: icon-sway 1.4s ease-in-out infinite; transform-origin: top center; }
+
+.group:hover .group-anim-steam,
+.hover-anim-steam:hover { animation: icon-steam 1.3s ease-in-out infinite; }
+
+.group:hover .group-anim-sun,
+.hover-anim-sun:hover { animation: icon-sun-glow 4s linear infinite; }
+
+.group:hover .group-anim-wifi,
+.hover-anim-wifi:hover { animation: icon-wifi-wave 1.1s ease-in-out infinite; }
+
+.group:hover .group-anim-plug,
+.hover-anim-plug:hover { animation: icon-plug-spark 1.2s ease-in-out infinite; }
+
+.group:hover .group-anim-star,
+.hover-anim-star:hover { animation: icon-star-twinkle 1.1s ease-in-out infinite; }
+
+.group:hover .group-anim-flame,
+.hover-anim-flame:hover { animation: icon-flame-flicker 1s ease-in-out infinite; transform-origin: bottom center; }
+
+.group:hover .group-anim-snowflake,
+.hover-anim-snowflake:hover { animation: icon-snowflake-drift 3s linear infinite; }
+
+.group:hover .group-anim-sparkle,
+.hover-anim-sparkle:hover { animation: icon-sparkle-twinkle 1.1s ease-in-out infinite; }
+
+.group:hover .group-anim-cart,
+.hover-anim-cart:hover { animation: icon-cart-bounce 1s ease-in-out infinite; }
+
+.group:hover .group-anim-heart,
+.hover-anim-heart:hover { animation: icon-heart-beat 0.9s ease-in-out infinite; }
+
+.group:hover .group-anim-pin,
+.hover-anim-pin:hover { animation: icon-pin-bounce 1.1s ease-in-out infinite; }
+
+.group:hover .group-anim-phone,
+.hover-anim-phone:hover { animation: icon-phone-ring 1.3s ease-in-out infinite; }
+
+.group:hover .group-anim-clock,
+.hover-anim-clock:hover { animation: icon-clock-tick 1.6s ease-in-out infinite; }
+
+/* Micro-interaction Spring & Active Pop */
+.anim-pop-on-click:active {
+  animation: icon-pop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
