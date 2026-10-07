@@ -11,7 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
-import { Route as AdminRouteImport } from './routes/admin'
+import { Route as Admin0026RouteImport } from './routes/admin-0026'
 import { Route as MenuRouteImport } from './routes/menu'
 import { Route as VisitRouteImport } from './routes/visit'
 
@@ -25,9 +25,9 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
+const Admin0026Route = Admin0026RouteImport.update({
+  id: '/admin-0026',
+  path: '/admin-0026',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MenuRoute = MenuRouteImport.update({
@@ -44,14 +44,14 @@ const VisitRoute = VisitRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/admin': typeof AdminRoute
+  '/admin-0026': typeof Admin0026Route
   '/menu': typeof MenuRoute
   '/visit': typeof VisitRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/admin': typeof AdminRoute
+  '/admin-0026': typeof Admin0026Route
   '/menu': typeof MenuRoute
   '/visit': typeof VisitRoute
 }
@@ -59,22 +59,22 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/admin': typeof AdminRoute
+  '/admin-0026': typeof Admin0026Route
   '/menu': typeof MenuRoute
   '/visit': typeof VisitRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/admin' | '/menu' | '/visit'
+  fullPaths: '/' | '/about' | '/admin-0026' | '/menu' | '/visit'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/admin' | '/menu' | '/visit'
-  id: '__root__' | '/' | '/about' | '/admin' | '/menu' | '/visit'
+  to: '/' | '/about' | '/admin-0026' | '/menu' | '/visit'
+  id: '__root__' | '/' | '/about' | '/admin-0026' | '/menu' | '/visit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
-  AdminRoute: typeof AdminRoute
+  Admin0026Route: typeof Admin0026Route
   MenuRoute: typeof MenuRoute
   VisitRoute: typeof VisitRoute
 }
@@ -95,11 +95,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
+    '/admin-0026': {
+      id: '/admin-0026'
+      path: '/admin-0026'
+      fullPath: '/admin-0026'
+      preLoaderRoute: typeof Admin0026RouteImport
       parentRoute: typeof rootRouteImport
     }
     '/menu': {
@@ -122,7 +122,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
-  AdminRoute: AdminRoute,
+  Admin0026Route: Admin0026Route,
   MenuRoute: MenuRoute,
   VisitRoute: VisitRoute,
 }
