@@ -73,11 +73,60 @@ export function isAdminAuthenticated(): boolean {
   }
 }
 
+export const DEFAULT_ADMIN_GATE_CODE = "0026";
+const GATE_CODE_KEY = "little_umbrella_admin_gate_code_v1";
+const GATE_UNLOCKED_KEY = "little_umbrella_admin_gate_unlocked_v1";
+
+export function getAdminGateCode(): string {
+  if (typeof window === "undefined") return DEFAULT_ADMIN_GATE_CODE;
+  try {
+    return localStorage.getItem(GATE_CODE_KEY) || DEFAULT_ADMIN_GATE_CODE;
+  } catch {
+    return DEFAULT_ADMIN_GATE_CODE;
+  }
+}
+
+export function updateAdminGateCode(newCode: string): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    const trimmed = newCode.trim();
+    if (!trimmed) return false;
+    localStorage.setItem(GATE_CODE_KEY, trimmed);
+    return true;
+  } catch (e) {
+    console.warn("Failed to update admin gate code:", e);
+    return false;
+  }
+}
+
+export function isGateUnlocked(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    return sessionStorage.getItem(GATE_UNLOCKED_KEY) === "true";
+  } catch {
+    return false;
+  }
+}
+
+export function setGateUnlocked(unlocked: boolean): void {
+  if (typeof window === "undefined") return;
+  try {
+    if (unlocked) {
+      sessionStorage.setItem(GATE_UNLOCKED_KEY, "true");
+    } else {
+      sessionStorage.removeItem(GATE_UNLOCKED_KEY);
+    }
+  } catch (e) {
+    console.warn("Failed to update gate unlock status:", e);
+  }
+}
+
 export function adminLogout(): void {
   if (typeof window === "undefined") return;
   try {
     sessionStorage.removeItem(AUTH_TOKEN_KEY);
     localStorage.removeItem(AUTH_TOKEN_KEY);
+    sessionStorage.removeItem(GATE_UNLOCKED_KEY);
   } catch (e) {
     console.warn("Error during admin logout:", e);
   }
