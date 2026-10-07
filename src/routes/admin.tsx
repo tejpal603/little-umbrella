@@ -2,6 +2,11 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useEffect, useMemo } from "react";
 import {
   SPECIAL_ACCESS_SECRET,
+  DEFAULT_ADMIN_GATE_CODE,
+  getAdminGateCode,
+  updateAdminGateCode,
+  isGateUnlocked,
+  setGateUnlocked,
   getAdminCredentials,
   updateAdminCredentials,
   verifyAdminLogin,
@@ -95,16 +100,82 @@ function AdminPage() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  // Gatekeeper state (secret link & passcode protection)
+  const [isGateOpen, setIsGateOpen] = useState(false);
+  const [passcodeInput, setPasscodeInput] = useState("");
+  const [showPasscodeInput, setShowPasscodeInput] = useState(false);
+  const [passcodeError, setPasscodeError] = useState("");
+  const [newGateCode, setNewGateCode] = useState("");
+
+  const checkGateAccess = () => {
+    if (typeof window === "undefined") return false;
+
+    // 1. If already authenticated
+    if (isAdminAuthenticated()) {
+      setIsGateOpen(true);
+      setGateUnlocked(true);
+      return true;
+    }
+
+    // 2. If previously unlocked in this session
+    if (isGateUnlocked()) {
+      setIsGateOpen(true);
+      return true;
+    }
+
+    const currentGateCode = getAdminGateCode();
+
+    // 3. Check hash (e.g. #0026, #/0026, #admin-0026)
+    const rawHash = window.location.hash.replace(/^[#/]+/, "").replace(/\/+$/, "").trim();
+    if (
+      rawHash === currentGateCode ||
+      rawHash.toLowerCase() === `admin-${currentGateCode}`.toLowerCase() ||
+      rawHash.toLowerCase() === currentGateCode.toLowerCase()
+    ) {
+      setIsGateOpen(true);
+      setGateUnlocked(true);
+      return true;
+    }
+
+    // 4. Check query params (e.g. ?code=0026, ?pin=0026, ?0026)
+    const params = new URLSearchParams(window.location.search);
+    const qCode = params.get("code") || params.get("pin") || params.get("pass") || params.get("gate");
+    if (qCode && qCode.trim() === currentGateCode) {
+      setIsGateOpen(true);
+      setGateUnlocked(true);
+      return true;
+    }
+    if (window.location.search.replace(/^\?/, "").trim() === currentGateCode) {
+      setIsGateOpen(true);
+      setGateUnlocked(true);
+      return true;
+    }
+
+    // 5. Special direct magic key
+    const specialKey = params.get("key") || params.get("access_token") || params.get("token") || params.get("special");
+    if (specialKey && specialKey.trim() === SPECIAL_ACCESS_SECRET) {
+      setIsGateOpen(true);
+      setGateUnlocked(true);
+      return true;
+    }
+
+    return false;
+  };
+
   // Check auth & special access link on mount
   useEffect(() => {
+    checkGateAccess();
+
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       const key = params.get("key") || params.get("access_token") || params.get("token") || params.get("special");
       if (key && loginWithSpecialKey(key)) {
         setIsAuthenticated(true);
+        setIsGateOpen(true);
+        setGateUnlocked(true);
         refreshData();
         toast.success("✨ Special 1-Click Link Verified! Welcome to Admin Portal.");
-        window.history.replaceState({}, "", "/admin");
+        window.history.replaceState({}, "", "/admin/#" + getAdminGateCode());
         return;
       }
     }
@@ -112,8 +183,19 @@ function AdminPage() {
     const auth = isAdminAuthenticated();
     setIsAuthenticated(auth);
     if (auth) {
+      setIsGateOpen(true);
+      setGateUnlocked(true);
       refreshData();
     }
+
+    const handleHashChange = () => {
+      checkGateAccess();
+    };
+
+    window.addEventListener("hashchange", handleHashChange);
+    return () => {
+      window.removeEventListener("hashchange", handleHashChange);
+    };
   }, []);
 
   // Listen to order and analytics update events
@@ -195,6 +277,8 @@ function AdminPage() {
     const success = verifyAdminLogin(usernameInput, passwordInput);
     if (success) {
       setIsAuthenticated(true);
+      setIsGateOpen(true);
+      setGateUnlocked(true);
       refreshData();
       toast.success("Welcome back to Admin Portal!");
     } else {
@@ -206,7 +290,43 @@ function AdminPage() {
   const handleLogout = () => {
     adminLogout();
     setIsAuthenticated(false);
+    setIsGateOpen(false);
+    setGateUnlocked(false);
+    if (typeof window !== "undefined") {
+      window.history.replaceState({}, "", "/admin");
+    }
     toast.info("Logged out successfully");
+  };
+
+  const handlePasscodeSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const currentGateCode = getAdminGateCode();
+    if (passcodeInput.trim() === currentGateCode) {
+      setIsGateOpen(true);
+      setGateUnlocked(true);
+      setPasscodeError("");
+      setShowPasscodeInput(false);
+      setPasscodeInput("");
+      toast.success("Passcode verified. Welcome!");
+    } else {
+      setPasscodeError("Invalid passcode. Please try again.");
+      toast.error("Incorrect access passcode");
+    }
+  };
+
+  const handleSaveGateCode = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newGateCode.trim()) {
+      toast.error("Passcode cannot be empty");
+      return;
+    }
+    const ok = updateAdminGateCode(newGateCode.trim());
+    if (ok) {
+      toast.success(`Secret access code updated to #${newGateCode.trim()}`);
+      setNewGateCode("");
+    } else {
+      toast.error("Failed to update passcode");
+    }
   };
 
   const handleStatusChange = (orderId: string, nextStatus: OrderStatus) => {
@@ -363,6 +483,81 @@ function AdminPage() {
       cancelled: orders.filter((o) => o.status === "cancelled").length,
     };
   }, [orders]);
+
+  // ==========================================
+  // VIEW: GATEKEEPER 404 (When gate is closed & not authenticated)
+  // ==========================================
+  if (!isGateOpen && !isAuthenticated) {
+    return (
+      <div className="flex min-h-[65vh] flex-col items-center justify-center px-4 py-16 text-center">
+        <div className="max-w-md w-full">
+          <h1 className="text-7xl font-display font-bold text-foreground tracking-tight">404</h1>
+          <p className="mt-4 text-base text-muted-foreground">
+            This page has wandered off for a coffee.
+          </p>
+          <div className="mt-6 flex items-center justify-center gap-3">
+            <Link
+              to="/"
+              className="inline-flex rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground hover:opacity-90 transition shadow-xs"
+            >
+              Go home
+            </Link>
+          </div>
+
+          {/* Discreet Staff Passcode Unlock */}
+          <div className="mt-16 pt-8 border-t border-border/40">
+            {!showPasscodeInput ? (
+              <button
+                type="button"
+                onClick={() => setShowPasscodeInput(true)}
+                className="text-xs text-muted-foreground/40 hover:text-muted-foreground transition inline-flex items-center gap-1 cursor-pointer"
+                title="Staff Access"
+              >
+                <Lock className="w-3 h-3" />
+                <span>Staff access</span>
+              </button>
+            ) : (
+              <form onSubmit={handlePasscodeSubmit} className="space-y-2 max-w-xs mx-auto">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="password"
+                    value={passcodeInput}
+                    onChange={(e) => {
+                      setPasscodeInput(e.target.value);
+                      setPasscodeError("");
+                    }}
+                    placeholder="Enter passcode"
+                    autoFocus
+                    className="flex-1 rounded-xl border border-input bg-background px-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring font-mono"
+                  />
+                  <button
+                    type="submit"
+                    className="rounded-xl bg-primary px-3.5 py-1.5 text-xs font-semibold text-primary-foreground hover:opacity-90 transition cursor-pointer"
+                  >
+                    Unlock
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowPasscodeInput(false);
+                      setPasscodeInput("");
+                      setPasscodeError("");
+                    }}
+                    className="text-xs text-muted-foreground hover:text-foreground px-2 py-1 cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                </div>
+                {passcodeError && (
+                  <p className="text-xs text-destructive text-center">{passcodeError}</p>
+                )}
+              </form>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // ==========================================
   // VIEW: LOGIN SCREEN (When not authenticated)
@@ -1205,6 +1400,72 @@ function AdminPage() {
                     <span>Save New Credentials</span>
                   </button>
                 </div>
+              </form>
+            </div>
+
+            {/* Secret URL & Passcode Protection */}
+            <div className="rounded-3xl border border-primary/20 bg-primary/5 p-6 space-y-4">
+              <div className="flex items-center gap-2 text-primary font-semibold text-sm">
+                <Lock className="w-4 h-4 text-sun" />
+                <span>Secret Admin Link & Access Passcode</span>
+              </div>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                To keep your admin portal hidden from strangers and bots, visiting <span className="font-mono text-foreground font-semibold">/admin</span> directly displays a 404 page. Only opening your secret link with <span className="font-mono text-foreground font-semibold">#{getAdminGateCode()}</span> unlocks the login screen.
+              </p>
+
+              <div className="space-y-1.5">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Your Strong Admin Link
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    readOnly
+                    value={
+                      typeof window !== "undefined"
+                        ? `${window.location.origin}/admin/#${getAdminGateCode()}`
+                        : `https://little-umbrella.vercel.app/admin/#${DEFAULT_ADMIN_GATE_CODE}`
+                    }
+                    className="w-full rounded-xl border border-input bg-card px-3.5 py-2.5 text-xs font-mono text-foreground select-all"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const url =
+                        typeof window !== "undefined"
+                          ? `${window.location.origin}/admin/#${getAdminGateCode()}`
+                          : `https://little-umbrella.vercel.app/admin/#${DEFAULT_ADMIN_GATE_CODE}`;
+                      navigator.clipboard.writeText(url);
+                      toast.success("Secret admin link copied to clipboard!");
+                    }}
+                    className="shrink-0 inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2.5 text-xs font-semibold text-primary-foreground hover:opacity-95 transition cursor-pointer"
+                  >
+                    <Copy className="w-3.5 h-3.5 text-sun" />
+                    <span>Copy Link</span>
+                  </button>
+                </div>
+              </div>
+
+              <form onSubmit={handleSaveGateCode} className="pt-3 border-t border-border/60 flex flex-col sm:flex-row gap-2 sm:items-end">
+                <div className="flex-1">
+                  <label className="block text-xs font-semibold text-muted-foreground mb-1">
+                    Update Access Passcode (Current: <span className="font-mono font-bold text-foreground">#{getAdminGateCode()}</span>)
+                  </label>
+                  <input
+                    type="text"
+                    value={newGateCode}
+                    onChange={(e) => setNewGateCode(e.target.value)}
+                    placeholder="e.g. 0026"
+                    className="w-full rounded-xl border border-input bg-background px-3.5 py-2 text-xs font-mono text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:opacity-95 transition cursor-pointer"
+                >
+                  <Check className="w-3.5 h-3.5 text-sun" />
+                  <span>Update Code</span>
+                </button>
               </form>
             </div>
 
